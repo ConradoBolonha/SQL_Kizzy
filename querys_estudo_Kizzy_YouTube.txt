@@ -1,0 +1,391 @@
+select
+  *
+from basedosdados.br_poder360_pesquisas.microdados
+where (instituto = 'Datafolha' or instituto = 'Ibope') and ano > 2013 and sigla_uf = 'SP'
+order by ano desc;
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where ano >= 2014 and sigla_partido != 'N/A' and sigla_partido != 'sem partido';
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where ano >= 2014 and not sigla_partido = 'N/A' and not sigla_partido = 'sem partido';
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where ano between 2014 and 2020;
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where ano in (2000, 2018, 2020, 2022);
+
+
+select
+  distinct sigla_partido,
+  sigla_uf,
+from basedosdados.br_poder360_pesquisas.microdados
+where sigla_uf in ('SP', 'MG', 'RJ')
+order by sigla_uf;
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where sigla_partido like 'P%'
+order by sigla_partido;
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where sigla_partido like 'P_'
+order by sigla_partido;
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where sigla_partido like '_P'
+order by sigla_partido;
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where sigla_partido like '_R__'
+order by sigla_partido;
+
+
+select
+  distinct sigla_partido,
+from basedosdados.br_poder360_pesquisas.microdados
+where sigla_partido like 'P\\_'
+order by sigla_partido
+
+
+select distinct
+  id_pesquisa,
+  ano,
+  cargo,
+  turno,
+  data_referencia,
+  instituto,
+from basedosdados.br_poder360_pesquisas.microdados
+where ano = 2018 and cargo = 'presidente';
+
+
+select nome_candidato, cpf_candidato, from basedosdados.br_tse_eleicoes.receitas_candidato where nome_candidato like 'RUI COSTA DOS SANTOS%' and cpf_candidato is not null;
+
+select
+  max(valor_receita) as ReceitaMaxima,
+  min(valor_receita) as ReceitaMinima,
+  round(avg(valor_receita)) as MediaReceita,
+  round(sum(valor_receita)) as SomaReceitas,
+from basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2018 and cpf_candidato = '23790997587';
+
+
+select
+  max(valor_receita) as ReceitaMaxima,
+  min(valor_receita) as ReceitaMinima,
+  round(avg(valor_receita)) as MediaReceita,
+  round(sum(valor_receita)) as SomaReceitas,
+  count (distinct(cpf_cnpj_doador)) as QtdeDoadores,
+from basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2018 and cpf_candidato = '23790997587';
+
+
+select
+  count(distinct(cpf_cnpj_doador)),
+  sigla_uf_doador,
+from basedosdados.br_tse_eleicoes.receitas_candidato
+where sigla_uf_doador like '__'
+group by sigla_uf_doador;
+
+
+select distinct
+  max(valor_receita) as Valor_Max_Receita,
+  min(valor_receita) as Valor_Min_Receita,
+  round(avg(valor_receita), 2) as Valor_Medio,
+  round(sum(valor_receita), 2) as Valor_Total_Receita,
+  count(valor_receita) as Qtde_Receitas_Geradas,
+  count(distinct(cpf_cnpj_doador)) as Qtde_Doadores,
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2018 and sigla_uf = 'BA' and cpf_candidato = '23790997587';
+
+/* Quantidade de fornecedores diferentes o governador RUI COSTA DOS SANTOS teve nas eleições de 2018
+renomeando o nome das colunas + total de despesas + valor máximo e mínimo de despesa. */
+
+select
+  count(distinct(cpf_cnpj_fornecedor)) as Qtde_Fornec_Distintos,
+  max(valor_despesa) as Valor_Max_Despesa,
+  min(valor_despesa) as Valor_Min_Despesa,
+  round(sum(valor_despesa)) as Total_Despesas,
+from
+  basedosdados.br_tse_eleicoes.despesas_candidato
+where ano = 2018 and sigla_uf = 'BA' and cpf_candidato = '23790997587';
+
+
+select
+  nome_candidato as Nome_Candidato,
+  count(distinct cpf_cnpj_doador) as Doador,
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2018 and sigla_uf = 'BA' and cargo = 'governador'
+group by nome_candidato
+order by Doador desc;
+
+
+select
+  nome_candidato as Nome_Candidato,
+  round(sum(valor_receita), 2) as Valor_Receita,
+  count(distinct cpf_cnpj_doador) as Qtde_Doador,
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2022 and sigla_uf = 'RS' and cargo = 'governador'
+group by Nome_Candidato
+order by valor_Receita desc;
+
+
+select
+  nome_candidato as Nome_Candidato,
+  round(sum(valor_receita), 2) as Valor_Receita,
+  count(distinct cpf_cnpj_doador) as Qtde_Doador,
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2018 and sigla_uf = 'BA' and cargo = 'governador'
+group by Nome_Candidato
+  having Qtde_Doador > 50 # --> Faz um filtro dentro do group by
+order by valor_Receita desc;
+
+
+
+select
+  nome_candidato as Nome_Candidato,
+  round(sum(valor_receita), 2) as Valor_Receita,
+  count(distinct cpf_cnpj_doador) as Qtde_Doador,
+    case when sum(valor_receita) > 1000000 then 'ALTA' # --> CASE THEN inseri uma coluna.
+      else 'BAIXA' end as Categoria_Receita
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2018 and sigla_uf = 'BA' and cargo = 'governador'
+group by Nome_Candidato
+order by valor_Receita desc;
+
+
+select
+  nome_candidato as NomeCandidato,
+  sigla_partido as UF,
+  round(sum(valor_receita), 2) as Valor_Receita,
+  count(distinct cpf_cnpj_doador) as Qtde_Doador,
+    case when sigla_partido = 'PT' then 'ESQUERDA'
+      else 'DIREITA' end as Espectro_Partidario
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2018 and sigla_uf = 'BA' and cargo = 'governador'
+group by NomeCandidato, UF
+order by nomeCandidato;
+
+
+select
+  sigla_partido,
+  case when sigla_partido = 'PT' then 'Esquerda'
+       when sigla_partido = 'AGIR' then 'Direita'
+       when sigla_partido = 'UNIÃO' then 'Direita'
+    else 'Outros' end as Espectro_Partidario
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2022 and cargo = 'governador'
+group by sigla_partido;
+
+
+select
+  sigla_partido,
+  case when sigla_partido = 'PT' or sigla_partido = 'UNIÃO' then 'Esquerda'
+       when sigla_partido = 'AGIR' then 'Direita'
+    else 'Outros' end as Espectro_Partidario
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2022 and cargo = 'governador'
+group by sigla_partido;
+
+
+select
+  sigla_partido,
+  case when sigla_partido in ('PT', 'UNIÃO') then 'ESQ'
+       when sigla_partido = 'AGIR' then 'Direita'
+    else 'Outros' end as Espectro_Partidario
+from
+  basedosdados.br_tse_eleicoes.receitas_candidato
+where ano = 2022 and cargo = 'governador'
+group by sigla_partido;
+
+
+select
+  nome_candidato as Nome_Candidato,
+  count(distinct(cpf_cnpj_fornecedor)) as Total_Fornec,
+  round(sum(valor_despesa)) as Total_Despesas,
+  case when round(sum(valor_despesa)) < 500000 then 'BAIXO'
+    else 'ALTA' end as Situacao_Despesa,
+from
+  basedosdados.br_tse_eleicoes.despesas_candidato
+where ano = 2018 and sigla_uf = 'BA' and cargo = 'governador'
+group by Nome_Candidato;
+
+
+select
+  id_candidato_bd as ID_Candidato,
+  round(sum(valor_item), 2) as Soma_Itens,
+from
+  basedosdados.br_tse_eleicoes.bens_candidato-- join basedosdados.br_tse_eleicoes.candidatos
+where 
+  ano = 2018 and sigla_uf = 'BA'
+group by ID_Candidato
+order by Soma_Itens desc
+limit 10;
+
+
+select
+  bc.id_candidato_bd as ID_Candidato,
+  round(sum(valor_item), 2) as Soma_Itens,
+from basedosdados.br_tse_eleicoes.bens_candidato as bc
+join basedosdados.br_tse_eleicoes.candidatos as c on bc.id_candidato_bd = c.id_candidato_bd
+where 
+  bc.ano = 2018 and bc.sigla_uf = 'BA'
+group by ID_Candidato
+order by Soma_Itens desc
+limit 10;
+
+
+--TOTAL DE BENS DOS CANDIDATOS A GOVERNADOR NO ESTADO DA BAHIA NO ANO DE 2018.
+select
+  bc.id_candidato_bd as ID,
+  c.nome as Nome,
+  round(sum(bc.valor_item), 2) as Total_Itens,
+from basedosdados.br_tse_eleicoes.bens_candidato as bc
+join basedosdados.br_tse_eleicoes.candidatos as c on bc.id_candidato_bd = c.id_candidato_bd
+where bc.ano = 2018 and bc.sigla_uf = 'BA' and c.ano = 2018 and c.cargo = 'governador'
+group by ID, Nome
+order by Total_Itens desc;
+
+
+--TOTAL DE BENS DOS CANDIDATOS A GOVERNADOR NO ESTADO DA BAHIA NO ANO DE 2018 (sem usar o join).
+select
+  bc.id_candidato_bd as ID,
+  c.nome as Nome,
+  round(sum(bc.valor_item), 2) as Total_Itens,
+from basedosdados.br_tse_eleicoes.bens_candidato as bc, basedosdados.br_tse_eleicoes.candidatos as c
+where bc.id_candidato_bd = c.id_candidato_bd and bc.ano = 2018 and bc.sigla_uf = 'BA' and c.ano = 2018 and c.cargo = 'governador'
+group by ID, Nome
+order by Total_Itens desc;
+
+
+-- CRIAR UM INSIGHT QUE TRAGA O TOTAL DE RECEITA E DESPESA DE CADA CANDIDATO A GOVERNADOR NA BAHIA
+-- NO ANO DE 2018.
+
+
+select
+  rc.nome_candidato as Nome_Candidato,
+  round(sum(rc.valor_receita), 2) as Valor_Receita,
+  round(sum(dc.valor_despesa), 2) as Valor_Despesa,
+from basedosdados.br_tse_eleicoes.receitas_candidato as rc
+join basedosdados.br_tse_eleicoes.despesas_candidato as dc on rc.id_candidato_bd = dc.id_candidato_bd
+where rc.ano = 2018 and rc.sigla_uf = 'BA' and rc.cargo = 'governador'
+group by Nome_Candidato
+order by Valor_Receita desc;
+
+
+select
+  round(sum(rc.valor_receita), 2) as Valor_Receita,
+  round(sum(dc.valor_despesa), 2) as Valor_Despesa,
+from basedosdados.br_tse_eleicoes.receitas_candidato as rc
+join basedosdados.br_tse_eleicoes.despesas_candidato as dc on rc.id_candidato_bd = dc.id_candidato_bd
+where rc.ano = 2018 and rc.sigla_uf = 'BA' and rc.cargo = 'governador';
+
+
+select
+  data_filiacao,
+  format_date('%d/%m/%Y %a', data_filiacao),
+  extract(day from data_filiacao) as Dia,
+from basedosdados.br_tse_filiacao_partidaria.microdados
+limit 20;
+
+
+select
+  data_filiacao,
+  data_desfiliacao,
+  date_diff(data_desfiliacao, data_filiacao, day) as Tempo_Filiado
+    -- case when data_desfiliacao is null then 2023-11-23
+    --   else data_desfiliacao end
+from basedosdados.br_tse_filiacao_partidaria.microdados
+where data_desfiliacao is not null
+limit 20;
+
+
+select
+data_filiacao,
+  date_diff(date '2018-10-07', data_filiacao, day) as Tempo_Filiado_Antes_2018,
+from
+  basedosdados.br_tse_filiacao_partidaria.microdados
+where extract(year from data_filiacao) = 2018
+order by Tempo_Filiado_Antes_2018 desc
+limit 20;
+
+
+select
+  *
+from 
+  basedosdados.br_tse_eleicoes.candidatos
+where contains_substr(nome_urna, 'Bolsonaro') = False and ano = 2020;
+
+
+select
+  *
+from 
+  basedosdados.br_tse_eleicoes.candidatos
+where contains_substr(nome_urna, 'Bolsonaro') = True and ano = 2020 and contains_substr(nome, 'Bolsonaro') = False and ano = 2020;
+
+
+select
+  distinct ano,
+from
+  basedosdados.br_tse_eleicoes.candidatos
+where id_municipio = '3506003' and cargo = 'vereador'
+order by ano desc;
+
+
+select
+  ca.nome as Nome_Vereador,
+  ca.cargo as Cargo,
+  ca.sigla_partido as Sigla_Partido,
+  round(sum(valor_receita), 2) as Valor_Receita,
+    case when sum(valor_receita) > 1000000 then 'ALTO'
+      else 'BAIXO' end,
+from basedosdados.br_tse_eleicoes.candidatos as ca
+join basedosdados.br_tse_eleicoes.receitas_candidato as rc on ca.id_candidato_bd = rc.id_candidato_bd
+where ca.ano = 2020 and ca.id_municipio = '3506003' and ca.cargo = 'vereador'
+group by 1, 2, 3
+order by 4 desc;
+
+
+select
+  c.nome as Nome_Candidato,
+  c.cpf as CPF_Candidato,
+  count(valor_receita) as Valor_Receita,
+  count(valor_despesa) as Valor_Despesa,
+from basedosdados.br_tse_eleicoes.candidatos as c
+join basedosdados.br_tse_eleicoes.receitas_candidato as rc on c.id_candidato_bd = rc.id_candidato_bd
+join basedosdados.br_tse_eleicoes.despesas_candidato as dc on rc.id_candidato_bd = dc.id_candidato_bd
+where c.ano = 2022 and c.sigla_uf = 'SP' and c.cargo = 'governador' and c.cpf = '05233117886'
+group by Nome_Candidato, CPF_Candidato
+order by Nome_Candidato;
